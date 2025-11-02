@@ -1,0 +1,5 @@
+# Ce dossier contient les migrations de base de données
+# Les fichiers de migration doivent suivre ce format :
+# - add_table_name.php
+# - add_column_name.php
+# etc.

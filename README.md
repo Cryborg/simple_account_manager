@@ -24,22 +24,9 @@ php -S localhost:8000
 
 ## 📚 Documentation
 
-### Documentation Principale
-
 | Fichier | Description |
 |---------|-------------|
 | **CLAUDE.md** | Documentation technique complète du projet |
-| **ENV_README.md** | Configuration des variables d'environnement (.env) |
-| **ADMIN_README.md** | Système d'administration et migrations |
-| **TESTING_README.md** | Documentation complète de la suite de tests |
-| **DEPLOYMENT.md** | Guide de déploiement FTP vers production |
-| **PHPSTORM_DATABASE_README.md** | Accès à la base SQLite depuis PHPStorm (Windows/WSL) |
-
-### Documentation Tests
-
-| Fichier | Description |
-|---------|-------------|
-| **tests/QUICK_START.md** | Guide rapide pour utiliser les tests |
 
 ## 🔧 Scripts Utilitaires
 
@@ -55,7 +42,6 @@ php -S localhost:8000
 | Script | Usage | Description |
 |--------|-------|-------------|
 | `php check_db.php` | Vérifier la base | Affiche l'état complet de la DB |
-| `php mark_migration_as_done.php` | Fix migrations | Marque des migrations comme exécutées |
 
 ### Scripts de Déploiement
 
@@ -76,11 +62,7 @@ php -S localhost:8000
 accounts/
 ├── 📄 Documentation
 │   ├── README.md                    # Ce fichier
-│   ├── CLAUDE.md                    # Doc technique complète
-│   ├── ADMIN_README.md              # Admin & migrations
-│   ├── ENV_README.md                # Configuration .env
-│   ├── TESTING_README.md            # Tests complets
-│   └── PHPSTORM_DATABASE_README.md  # Accès DB
+│   └── CLAUDE.md                    # Doc technique complète
 │
 ├── 🔧 Configuration
 │   ├── .env.example                 # Template de configuration
@@ -93,9 +75,7 @@ accounts/
 │   ├── init_db.php                  # Initialisation
 │   ├── data/
 │   │   └── accounts.db              # Base SQLite
-│   └── migrations/
-│       ├── add_admin_field.php
-│       └── add_user_settings.php
+│   └── migrations/                  # Futures migrations
 │
 ├── 🌐 Pages Publiques
 │   ├── login.php
@@ -125,7 +105,6 @@ accounts/
 │   ├── run_tests.php                # Runner principal
 │   ├── TestFramework.php            # Framework custom
 │   ├── TestHelper.php               # Utilitaires
-│   ├── QUICK_START.md               # Guide rapide
 │   ├── unit/                        # Tests unitaires (20)
 │   │   ├── ConfigTest.php
 │   │   ├── DatabaseTest.php
@@ -137,7 +116,6 @@ accounts/
 │
 └── 🛠️ Utilitaires
     ├── check_db.php                 # Vérification DB
-    ├── mark_migration_as_done.php   # Fix migrations
     ├── copy_db_to_windows.sh        # Copie DB (PHPStorm)
     └── watch_db.sh                  # Sync DB (PHPStorm)
 ```
@@ -159,8 +137,6 @@ php tests/run_tests.php
 - Framework lightweight (KISS)
 - Base de données de test isolée
 - Exécution rapide (~1-2s)
-
-Voir **TESTING_README.md** pour plus de détails.
 
 ## 🔑 Technologies
 
@@ -204,20 +180,6 @@ Voir **TESTING_README.md** pour plus de détails.
 - ✅ Tokens sécurisés pour reset password
 - ✅ Configuration sensible dans .env (hors Git)
 
-## 📖 Guides Spécifiques
-
-### Configuration (.env)
-👉 Voir **ENV_README.md**
-
-### Administration et Migrations
-👉 Voir **ADMIN_README.md**
-
-### Tests
-👉 Voir **TESTING_README.md** (complet) ou **tests/QUICK_START.md** (rapide)
-
-### Accès DB depuis PHPStorm
-👉 Voir **PHPSTORM_DATABASE_README.md**
-
 ## 🚀 Déploiement en Production
 
 ### Déploiement Automatique (Recommandé)
@@ -235,40 +197,17 @@ Le script synchronise automatiquement les fichiers via FTP tout en **préservant
 - ✅ Le `.env` de prod
 - ✅ Les fichiers qui ne doivent pas être en prod (tests, docs, etc.)
 
-👉 Voir **DEPLOYMENT.md** pour le guide complet
-
-### Premier Déploiement
-
-1. **Configurer FTP** dans `.env` :
-   ```env
-   FTP_HOST=ftp.example.com
-   FTP_USER=username
-   FTP_PASSWORD=password
-   FTP_REMOTE_PATH=/www/path/to/app
-   ```
-
-2. **Créer le .env de prod** sur le serveur (manuellement via FTP)
-
-3. **Exécuter les migrations** (via SSH ou admin) :
-   ```bash
-   php migrations/add_admin_field.php
-   php migrations/add_user_settings.php
-   php mark_migration_as_done.php
-   ```
-
-4. **Vérifier** :
-   - Se connecter avec Cryborg (admin)
-   - Aller sur `/admin.php`
-   - Vérifier que tout fonctionne
+**Configuration FTP** dans `.env` :
+```env
+FTP_HOST=ftp.example.com
+FTP_USER=username
+FTP_PASSWORD=password
+FTP_REMOTE_PATH=/www/path/to/app
+```
 
 ## 🆘 Support
 
 ### Problèmes Courants
-
-**Alerte "Migrations en attente" alors que tout est à jour ?**
-```bash
-php mark_migration_as_done.php
-```
 
 **Base de données verrouillée ?**
 ```bash
