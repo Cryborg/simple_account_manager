@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Git Pre-Commit Hook Example
+# Place this file in .git/hooks/pre-commit (and make it executable)
+# It will run tests before allowing a commit
+
+echo "Running tests before commit..."
+
+# Run tests
+php tests/run_tests.php
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ Tests failed! Commit aborted."
+    echo "Fix the tests or use 'git commit --no-verify' to skip this check."
+    exit 1
+fi
+
+echo ""
+echo "✅ All tests passed! Proceeding with commit."
+exit 0

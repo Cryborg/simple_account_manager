@@ -1,0 +1,16 @@
+{
+  "name": "Mes Comptes",
+  "short_name": "Comptes",
+  "description": "Application de gestion de comptes personnels",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#4a9eff",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
