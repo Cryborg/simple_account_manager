@@ -238,16 +238,16 @@ $stmt = $db->prepare("
         -- Transactions ANNUELLES récurrentes actives (avec nombre d'années)
         (
             periodicity = 'annuel'
-            AND strftime('%m-%d', transaction_date) <= strftime('%m-%d', ?)
+            AND strftime('%m', transaction_date) = strftime('%m', ?)
             AND transaction_date <= ?
             AND recurring_months > 0
-            AND CAST((julianday(?) - julianday(transaction_date)) / 365.25 AS INTEGER) < recurring_months
+            AND CAST((strftime('%Y', ?) - strftime('%Y', transaction_date)) AS INTEGER) < recurring_months
         )
         OR
         -- Transactions ANNUELLES à répétition illimitée (sans limite de nombre, optionnellement limitées par date)
         (
             periodicity = 'annuel'
-            AND strftime('%m-%d', transaction_date) <= strftime('%m-%d', ?)
+            AND strftime('%m', transaction_date) = strftime('%m', ?)
             AND transaction_date <= ?
             AND recurring_months = 0
             AND (end_date IS NULL OR ? <= end_date)
