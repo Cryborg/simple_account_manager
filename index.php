@@ -139,8 +139,11 @@ foreach ($allTransactions as $t) {
         } elseif ($t['periodicity'] === 'hebdo') {
             $elapsed = floor((strtotime($currentDate) - strtotime($t['transaction_date'])) / (7 * 86400)) + 1;
             $count = min($t['recurring_months'], $elapsed);
+        } elseif ($t['periodicity'] === 'annuel') {
+            $elapsed = floor((strtotime($currentDate) - strtotime($t['transaction_date'])) / (365.25 * 86400)) + 1;
+            $count = min($t['recurring_months'], $elapsed);
         }
-    } elseif ($t['recurring_months'] === 0 && ($t['periodicity'] === 'mensuel' || $t['periodicity'] === 'hebdo')) {
+    } elseif ($t['recurring_months'] === 0 && ($t['periodicity'] === 'mensuel' || $t['periodicity'] === 'hebdo' || $t['periodicity'] === 'annuel')) {
         // Récurrence infinie
         $endDate = $t['end_date'] ? min($t['end_date'], $currentDate) : $currentDate;
 
@@ -148,6 +151,8 @@ foreach ($allTransactions as $t) {
             $count = floor((strtotime($endDate) - strtotime($t['transaction_date'])) / (30.44 * 86400)) + 1;
         } elseif ($t['periodicity'] === 'hebdo') {
             $count = floor((strtotime($endDate) - strtotime($t['transaction_date'])) / (7 * 86400)) + 1;
+        } elseif ($t['periodicity'] === 'annuel') {
+            $count = floor((strtotime($endDate) - strtotime($t['transaction_date'])) / (365.25 * 86400)) + 1;
         }
     }
 
@@ -191,8 +196,8 @@ $stmt = $db->prepare("
     FROM transactions
     WHERE user_id = ?
     AND (
-        -- Transactions du mois en cours (ponctuelles ou annuelles qui tombent ce mois)
-        (strftime('%Y-%m', transaction_date) = ? AND transaction_date <= date('now'))
+        -- Transactions du mois en cours (ponctuelles qui tombent ce mois exactement)
+        (strftime('%Y-%m', transaction_date) = ? AND transaction_date <= date('now') AND periodicity != 'annuel')
         OR
         -- Transactions MENSUELLES récurrentes actives (avec nombre de mois)
         (
@@ -229,9 +234,27 @@ $stmt = $db->prepare("
             AND transaction_date <= ?
             AND (end_date IS NULL OR ? <= end_date)
         )
+        OR
+        -- Transactions ANNUELLES récurrentes actives (avec nombre d'années)
+        (
+            periodicity = 'annuel'
+            AND strftime('%m-%d', transaction_date) <= strftime('%m-%d', ?)
+            AND transaction_date <= ?
+            AND recurring_months > 0
+            AND CAST((julianday(?) - julianday(transaction_date)) / 365.25 AS INTEGER) < recurring_months
+        )
+        OR
+        -- Transactions ANNUELLES à répétition illimitée (sans limite de nombre, optionnellement limitées par date)
+        (
+            periodicity = 'annuel'
+            AND strftime('%m-%d', transaction_date) <= strftime('%m-%d', ?)
+            AND transaction_date <= ?
+            AND recurring_months = 0
+            AND (end_date IS NULL OR ? <= end_date)
+        )
     )
 ");
-$stmt->execute([$userId, $currentMonth, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate]);
+$stmt->execute([$userId, $currentMonth, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate, $currentDate]);
 $monthTotals = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Gérer le tri
