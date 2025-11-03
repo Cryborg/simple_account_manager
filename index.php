@@ -398,18 +398,16 @@ $selectedType = $_GET['type'] ?? 'depense';
             <div class="header-stats-inline">
                 <div class="header-stat recettes">
                     <span class="stat-label">Recettes</span>
-                    <span class="stat-value positive">+<?= number_format($monthTotals['month_recettes'], 2, ',', ' ') ?> €</span>
+                    <span class="stat-value positive counter" data-target="<?= $monthTotals['month_recettes'] ?>" data-prefix="+">+0,00 €</span>
                 </div>
                 <div class="header-stat depenses">
                     <span class="stat-label">Dépenses</span>
-                    <span class="stat-value negative">-<?= number_format($monthTotals['month_depenses'], 2, ',', ' ') ?> €</span>
+                    <span class="stat-value negative counter" data-target="<?= $monthTotals['month_depenses'] ?>" data-prefix="-">-0,00 €</span>
                 </div>
                 <div class="header-stat balance">
                     <span class="stat-label">Solde du mois</span>
                     <?php $monthBalance = $monthTotals['month_recettes'] - $monthTotals['month_depenses']; ?>
-                    <span class="stat-value <?= $monthBalance >= 0 ? 'positive' : 'negative' ?>">
-                        <?= number_format($monthBalance, 2, ',', ' ') ?> €
-                    </span>
+                    <span class="stat-value <?= $monthBalance >= 0 ? 'positive' : 'negative' ?> counter" data-target="<?= $monthBalance ?>" data-prefix="<?= $monthBalance >= 0 ? '' : '' ?>">0,00 €</span>
                 </div>
             </div>
         </header>
@@ -542,9 +540,12 @@ $selectedType = $_GET['type'] ?? 'depense';
                                 <td><?= formatDate($transaction['transaction_date'], $userSettings) ?></td>
                                 <td>
                                     <?php if ($transaction['category_name']): ?>
-                                        <span style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <span class="category-display">
+                                            <?php if ($transaction['category_color']): ?>
+                                                <span class="category-color-dot" style="background-color: <?= htmlspecialchars($transaction['category_color']) ?>;"></span>
+                                            <?php endif; ?>
                                             <?php if ($transaction['category_icon']): ?>
-                                                <span style="font-size: 1.2rem;"><?= htmlspecialchars($transaction['category_icon']) ?></span>
+                                                <span class="category-icon"><?= htmlspecialchars($transaction['category_icon']) ?></span>
                                             <?php endif; ?>
                                             <span><?= htmlspecialchars($transaction['category_name']) ?></span>
                                         </span>
@@ -583,10 +584,15 @@ $selectedType = $_GET['type'] ?? 'depense';
 
                                         // Limiter au nombre total de récurrences
                                         $currentOccurrence = min($elapsedMonths, $transaction['recurring_months']);
+                                        $percentage = ($currentOccurrence / $transaction['recurring_months']) * 100;
+                                        $isCompleted = $currentOccurrence >= $transaction['recurring_months'];
                                         ?>
-                                        <span class="recurring-badge" title="<?= $transaction['recurring_months'] ?> <?= $transaction['periodicity'] === 'mensuel' ? 'mois' : ($transaction['periodicity'] === 'hebdo' ? 'semaines' : 'ans') ?>">
-                                            <?= $currentOccurrence ?>/<?= $transaction['recurring_months'] ?>
-                                        </span>
+                                        <div class="recurring-progress-container" title="<?= $currentOccurrence ?>/<?= $transaction['recurring_months'] ?> <?= $transaction['periodicity'] === 'mensuel' ? 'mois' : ($transaction['periodicity'] === 'hebdo' ? 'semaines' : 'ans') ?>">
+                                            <div class="recurring-progress-bar">
+                                                <div class="recurring-progress-fill <?= $isCompleted ? 'completed' : '' ?>" style="width: <?= $percentage ?>%;"></div>
+                                            </div>
+                                            <span class="recurring-progress-text"><?= $currentOccurrence ?>/<?= $transaction['recurring_months'] ?></span>
+                                        </div>
                                     <?php else: ?>
                                         -
                                     <?php endif; ?>
@@ -611,6 +617,7 @@ $selectedType = $_GET['type'] ?? 'depense';
     <script src="js/recurring.js"></script>
     <script src="js/periodicity.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="js/counter-animation.js"></script>
     <script>
         // Enregistrer le Service Worker pour le mode hors connexion
         if ('serviceWorker' in navigator) {
