@@ -7,6 +7,9 @@ session_start();
 // Configuration de la base de données
 define('DB_PATH', __DIR__ . '/' . env('DB_PATH', 'data/accounts.db'));
 
+// Version du CSS pour le cache busting
+define('CSS_VERSION', '1.0.1');
+
 // Créer le répertoire data s'il n'existe pas
 if (!file_exists(__DIR__ . '/data')) {
     mkdir(__DIR__ . '/data', 0755, true);

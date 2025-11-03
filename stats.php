@@ -115,7 +115,7 @@ foreach ($allTransactions as $t) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistiques - Mes Comptes</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?= CSS_VERSION ?>">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>

@@ -274,7 +274,7 @@ $selectedType = $_GET['type'] ?? 'depense';
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a9eff">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?= CSS_VERSION ?>">
 </head>
 <body>
     <?php include 'includes/sidebar.php'; ?>
