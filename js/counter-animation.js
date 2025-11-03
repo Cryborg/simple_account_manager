@@ -23,7 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     maximumFractionDigits: 2
                 });
 
-                counter.textContent = `${prefix}${formatted} €`;
+                // Ajouter le signe négatif si la valeur est négative et qu'il n'y a pas de prefix
+                const sign = (target < 0 && prefix === '') ? '-' : '';
+                counter.textContent = `${prefix}${sign}${formatted} €`;
                 requestAnimationFrame(updateCounter);
             } else {
                 // Valeur finale exacte
@@ -31,7 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                counter.textContent = `${prefix}${formatted} €`;
+                // Ajouter le signe négatif si la valeur est négative et qu'il n'y a pas de prefix
+                const sign = (target < 0 && prefix === '') ? '-' : '';
+                counter.textContent = `${prefix}${sign}${formatted} €`;
             }
         };
 

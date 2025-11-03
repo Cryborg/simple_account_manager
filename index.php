@@ -421,7 +421,7 @@ $selectedType = $_GET['type'] ?? 'depense';
                     <span class="stat-value negative counter" data-target="<?= $monthTotals['month_depenses'] ?>" data-prefix="-">-0,00 €</span>
                 </div>
                 <div class="header-stat balance">
-                    <span class="stat-label">Solde du mois</span>
+                    <span class="stat-label">Balance</span>
                     <?php $monthBalance = $monthTotals['month_recettes'] - $monthTotals['month_depenses']; ?>
                     <span class="stat-value <?= $monthBalance >= 0 ? 'positive' : 'negative' ?> counter" data-target="<?= $monthBalance ?>" data-prefix="<?= $monthBalance >= 0 ? '' : '' ?>">0,00 €</span>
                 </div>
