@@ -324,6 +324,21 @@ header {
         flex-direction: column;
         gap: 0.75rem;
     }
+
+    .header-stat {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .stat-label {
+        text-align: left;
+    }
+
+    .stat-value {
+        text-align: right;
+    }
 }
 
 /* Balance */
@@ -1652,6 +1667,10 @@ tbody tr:target {
 
     .form-row {
         grid-template-columns: 1fr;
+    }
+
+    .form-row-icon-color {
+        grid-template-columns: 1fr 1fr;
     }
 
     header {

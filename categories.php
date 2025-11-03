@@ -137,9 +137,9 @@ foreach ($categories as $cat) {
                                 <span class="category-icon" style="font-size: 2rem;"><?= htmlspecialchars($cat['icon']) ?></span>
                                 <div class="category-details">
                                     <h4><?= htmlspecialchars($cat['name']) ?></h4>
-                                    <span class="category-meta">
-                                        <?= $cat['is_default'] ? '🔒 Par défaut' : '👤 Personnalisée' ?>
-                                    </span>
+                                    <?php if ($cat['is_default']): ?>
+                                        <span class="category-meta">🔒 Par défaut</span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="category-actions">
@@ -162,9 +162,9 @@ foreach ($categories as $cat) {
                                 <span class="category-icon" style="font-size: 2rem;"><?= htmlspecialchars($cat['icon']) ?></span>
                                 <div class="category-details">
                                     <h4><?= htmlspecialchars($cat['name']) ?></h4>
-                                    <span class="category-meta">
-                                        <?= $cat['is_default'] ? '🔒 Par défaut' : '👤 Personnalisée' ?>
-                                    </span>
+                                    <?php if ($cat['is_default']): ?>
+                                        <span class="category-meta">🔒 Par défaut</span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="category-actions">
