@@ -1669,8 +1669,17 @@ tbody tr:target {
         grid-template-columns: 1fr;
     }
 
-    .form-row-icon-color {
+    .form-row.form-row-icon-color {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .form-group {
+        min-width: 0;
+    }
+
+    input[type="text"],
+    input[type="color"] {
+        max-width: 100%;
     }
 
     header {
