@@ -203,7 +203,34 @@ php tests/run_tests.php
 3. Si des tests échouent → corriger
 4. Re-tester jusqu'à ce que tout passe
 5. Commit
-6. Déployer
+6. Déployer (voir section Déploiement ci-dessous)
+
+## Déploiement
+
+**IMPORTANT pour Claude Code** : Pour déployer automatiquement sans confirmation manuelle :
+
+```bash
+echo "oui" | ./deploy.sh
+```
+
+**Pour déploiement manuel** :
+```bash
+./deploy.sh
+# Puis taper "oui" quand demandé
+```
+
+**Ce que fait le script :**
+- Upload tous les fichiers modifiés via FTP
+- Supprime les fichiers obsolètes sur le serveur
+- **Préserve** automatiquement :
+  - `data/` (base de données de prod)
+  - `.env` (configuration serveur)
+  - `tests/` (suite de tests)
+  - Scripts utilitaires et documentation
+
+**Après déploiement :**
+- Vérifier que le site fonctionne en production
+- Tester les fonctionnalités modifiées
 
 ### CSS
 - Thème sombre uniquement
