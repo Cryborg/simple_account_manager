@@ -507,9 +507,32 @@ $selectedType = $_GET['type'] ?? 'depense';
         </div>
 
         <div class="transactions">
-            <h3>Historique</h3>
+            <div class="transactions-header">
+                <h3>Historique</h3>
+                <div class="view-toggle">
+                    <button type="button" class="view-toggle-btn active" data-view="table" title="Vue tableau">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                    </button>
+                    <button type="button" class="view-toggle-btn" data-view="cards" title="Vue cartes">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </button>
+                </div>
+            </div>
             <?php if (empty($transactions)): ?>
-                <p class="no-data">Aucune transaction enregistrée</p>
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <h4 class="empty-state-title">Aucune transaction pour le moment</h4>
+                    <p class="empty-state-message">Commence par ajouter ta première transaction pour suivre tes finances !</p>
+                </div>
             <?php else: ?>
                 <table>
                     <thead>
@@ -609,6 +632,81 @@ $selectedType = $_GET['type'] ?? 'depense';
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
+                <!-- Vue cartes pour mobile -->
+                <div class="transactions-cards">
+                    <?php foreach ($transactions as $transaction): ?>
+                        <div class="transaction-card" id="transaction-card-<?= $transaction['id'] ?>">
+                            <div class="transaction-card-header">
+                                <span class="transaction-card-date"><?= formatDate($transaction['transaction_date'], $userSettings) ?></span>
+                                <span class="transaction-card-amount <?= $transaction['type'] ?>">
+                                    <?= $transaction['type'] === 'recette' ? '+' : '-' ?><?= number_format($transaction['amount'], 2, ',', ' ') ?> €
+                                </span>
+                            </div>
+                            <div class="transaction-card-body">
+                                <?php if ($transaction['category_name']): ?>
+                                    <div class="transaction-card-row">
+                                        <span class="transaction-card-label">Catégorie</span>
+                                        <span class="transaction-card-value category-display">
+                                            <?php if ($transaction['category_color']): ?>
+                                                <span class="category-color-dot" style="background-color: <?= htmlspecialchars($transaction['category_color']) ?>;"></span>
+                                            <?php endif; ?>
+                                            <?php if ($transaction['category_icon']): ?>
+                                                <span class="category-icon"><?= htmlspecialchars($transaction['category_icon']) ?></span>
+                                            <?php endif; ?>
+                                            <?= htmlspecialchars($transaction['category_name']) ?>
+                                        </span>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if ($transaction['description']): ?>
+                                    <div class="transaction-card-row">
+                                        <span class="transaction-card-label">Description</span>
+                                        <span class="transaction-card-value"><?= htmlspecialchars($transaction['description']) ?></span>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="transaction-card-row">
+                                    <span class="transaction-card-label">Périodicité</span>
+                                    <span class="transaction-card-value"><?= ucfirst($transaction['periodicity'] ?? 'mensuel') ?></span>
+                                </div>
+                                <?php if ($transaction['recurring_months'] > 1): ?>
+                                    <?php
+                                    $startDate = new DateTime($transaction['transaction_date']);
+                                    $today = new DateTime();
+                                    $interval = $startDate->diff($today);
+                                    $elapsedMonths = 0;
+                                    switch ($transaction['periodicity']) {
+                                        case 'mensuel':
+                                            $elapsedMonths = ($interval->y * 12) + $interval->m + 1;
+                                            break;
+                                        case 'hebdo':
+                                            $elapsedMonths = floor($interval->days / 7) + 1;
+                                            break;
+                                        case 'annuel':
+                                            $elapsedMonths = $interval->y + 1;
+                                            break;
+                                    }
+                                    $currentOccurrence = min($elapsedMonths, $transaction['recurring_months']);
+                                    $percentage = ($currentOccurrence / $transaction['recurring_months']) * 100;
+                                    $isCompleted = $currentOccurrence >= $transaction['recurring_months'];
+                                    ?>
+                                    <div class="transaction-card-row">
+                                        <span class="transaction-card-label">Récurrence</span>
+                                        <div class="recurring-progress-container" style="flex: 1; justify-content: flex-end;">
+                                            <div class="recurring-progress-bar">
+                                                <div class="recurring-progress-fill <?= $isCompleted ? 'completed' : '' ?>" style="width: <?= $percentage ?>%;"></div>
+                                            </div>
+                                            <span class="recurring-progress-text"><?= $currentOccurrence ?>/<?= $transaction['recurring_months'] ?></span>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="transaction-card-actions">
+                                <button type="button" class="btn-edit" onclick='openEditModal(<?= json_encode($transaction) ?>)'>✎ Modifier</button>
+                                <button type="button" class="btn-delete" onclick='openDeleteModal(<?= json_encode($transaction) ?>)'>✕ Supprimer</button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -618,6 +716,9 @@ $selectedType = $_GET['type'] ?? 'depense';
     <script src="js/periodicity.js"></script>
     <script src="js/sidebar.js"></script>
     <script src="js/counter-animation.js"></script>
+    <script src="js/confetti.js"></script>
+    <script src="js/form-validation.js"></script>
+    <script src="js/view-toggle.js"></script>
     <script>
         // Enregistrer le Service Worker pour le mode hors connexion
         if ('serviceWorker' in navigator) {

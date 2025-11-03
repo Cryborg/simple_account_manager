@@ -1931,3 +1931,220 @@ tbody tr:target {
     white-space: nowrap;
     font-weight: 500;
 }
+
+/* View Toggle */
+.transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+}
+
+.view-toggle-btn {
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-toggle-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.view-toggle-btn.active {
+    background: var(--accent);
+    color: white;
+}
+
+/* Card View (both mobile and desktop) */
+.transactions-cards {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.transactions[data-view="cards"] table {
+    display: none;
+}
+
+.transactions[data-view="cards"] .transactions-cards {
+    display: flex;
+}
+
+/* Transaction Cards (works on both mobile and desktop) */
+.transaction-card {
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.transaction-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.transaction-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.transaction-card-date {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.transaction-card-amount {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.transaction-card-amount.recette {
+    color: var(--success);
+}
+
+.transaction-card-amount.depense {
+    color: var(--danger);
+}
+
+.transaction-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.transaction-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.transaction-card-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.transaction-card-value {
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.transaction-card-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.transaction-card-actions .btn-edit,
+.transaction-card-actions .btn-delete {
+    flex: 1;
+    max-width: 120px;
+}
+
+/* Mobile: Force card view, hide toggle */
+@media (max-width: 768px) {
+    .view-toggle {
+        display: none;
+    }
+
+    .transactions table {
+        display: none !important;
+    }
+
+    .transactions-cards {
+        display: flex !important;
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-message {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Form Validation Checkmarks */
+.validation-check {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--success);
+    font-size: 1.2rem;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.validation-check.show {
+    opacity: 1;
+    animation: checkPop 0.3s ease;
+}
+
+@keyframes checkPop {
+    0% {
+        transform: translateY(-50%) scale(0);
+    }
+    50% {
+        transform: translateY(-50%) scale(1.2);
+    }
+    100% {
+        transform: translateY(-50%) scale(1);
+    }
+}
