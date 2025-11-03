@@ -1652,3 +1652,107 @@ tbody tr:target {
         align-self: flex-end;
     }
 }
+
+/* Flash Messages */
+.flash-messages {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+}
+
+.flash-message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: var(--bg-secondary);
+    border-left: 4px solid;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.flash-message.flash-success {
+    border-left-color: var(--success);
+}
+
+.flash-message.flash-error {
+    border-left-color: var(--danger);
+}
+
+.flash-message.flash-info {
+    border-left-color: var(--accent);
+}
+
+.flash-icon {
+    font-size: 1.5rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.flash-success .flash-icon {
+    color: var(--success);
+}
+
+.flash-error .flash-icon {
+    color: var(--danger);
+}
+
+.flash-info .flash-icon {
+    color: var(--accent);
+}
+
+.flash-text {
+    flex: 1;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.flash-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    flex-shrink: 0;
+}
+
+.flash-close:hover {
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .flash-messages {
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+    }
+
+    .flash-message {
+        padding: 0.875rem 1rem;
+    }
+}

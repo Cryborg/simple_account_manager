@@ -15,18 +15,26 @@ function openEditModal(transaction) {
     loadCategories(transaction.type);
 
     // Cocher le bon radio et afficher le bon champ
+    const noLimitRadio = document.querySelector('input[name="edit_recurrence_type"][value="no_limit"]');
     const countRadio = document.querySelector('input[name="edit_recurrence_type"][value="count"]');
     const dateRadio = document.querySelector('input[name="edit_recurrence_type"][value="date"]');
     const editRecurringMonthsGroup = document.getElementById('edit_recurring_months_group');
     const editEndDateGroup = document.getElementById('edit_end_date_group');
 
     if (transaction.end_date) {
+        // Cas 1 : date de fin définie → "Jusqu'à une date"
         dateRadio.checked = true;
         editRecurringMonthsGroup.style.display = 'none';
         editEndDateGroup.style.display = 'flex';
-    } else {
+    } else if (transaction.recurring_months >= 1) {
+        // Cas 2 : nombre d'occurrences défini → "Nombre d'occurrences"
         countRadio.checked = true;
         editRecurringMonthsGroup.style.display = 'flex';
+        editEndDateGroup.style.display = 'none';
+    } else {
+        // Cas 3 : pas de limite (recurring_months = 0, pas de end_date) → "Pas de limite"
+        noLimitRadio.checked = true;
+        editRecurringMonthsGroup.style.display = 'none';
         editEndDateGroup.style.display = 'none';
     }
 
@@ -196,6 +204,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialiser l'état du bloc "Ajouter une transaction"
     initAddTransactionToggle();
+
+    // Auto-fermeture des messages flash après 5 secondes
+    const flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(message => {
+        setTimeout(() => {
+            message.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            message.style.opacity = '0';
+            message.style.transform = 'translateX(100%)';
+            setTimeout(() => message.remove(), 300);
+        }, 5000);
+    });
 });
 
 // Gestion du toggle du bloc "Ajouter une transaction"

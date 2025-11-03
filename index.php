@@ -41,6 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $recurringMonths = (int) ($_POST['recurring_months'] ?? 0);
     $endDate = !empty($_POST['end_date']) ? $_POST['end_date'] : null;
 
+    // Validation : recurring_months doit être 0 (infini) ou >= 1, jamais négatif
+    if ($recurringMonths < 0) {
+        $recurringMonths = 0;
+    }
+
     // Si une date de fin est spécifiée, on passe en mode répétition illimitée avec date limite
     if ($endDate) {
         $recurringMonths = 0;
@@ -51,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $stmt = $db->prepare("INSERT INTO transactions (user_id, type, amount, description, transaction_date, periodicity, category_id, recurring_months, remaining_occurrences, end_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$userId, $type, $amount, $description, $date, $periodicity, $categoryId, $recurringMonths, $remainingOccurrences, $endDate]);
 
+    setFlash('success', 'Transaction ajoutée avec succès !');
     header('Location: index.php?type=' . urlencode($type));
     exit;
 }
@@ -88,6 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $recurringMonths = (int) ($_POST['recurring_months'] ?? 0);
     $endDate = !empty($_POST['end_date']) ? $_POST['end_date'] : null;
 
+    // Validation : recurring_months doit être 0 (infini) ou >= 1, jamais négatif
+    if ($recurringMonths < 0) {
+        $recurringMonths = 0;
+    }
+
     // Si une date de fin est spécifiée, on passe en mode répétition illimitée avec date limite
     if ($endDate) {
         $recurringMonths = 0;
@@ -98,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $stmt = $db->prepare("UPDATE transactions SET type = ?, amount = ?, description = ?, transaction_date = ?, periodicity = ?, category_id = ?, recurring_months = ?, remaining_occurrences = ?, end_date = ? WHERE id = ? AND user_id = ?");
     $stmt->execute([$type, $amount, $description, $date, $periodicity, $categoryId, $recurringMonths, $remainingOccurrences, $endDate, $id, $userId]);
 
+    setFlash('success', 'Transaction modifiée avec succès !');
     header('Location: index.php#transaction-' . $id);
     exit;
 }
@@ -108,64 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $stmt = $db->prepare("DELETE FROM transactions WHERE id = ? AND user_id = ?");
     $stmt->execute([$id, $userId]);
 
+    setFlash('success', 'Transaction supprimée avec succès !');
     header('Location: index.php');
     exit;
 }
-
-// Récupérer le solde global en comptant toutes les occurrences passées des récurrences
-$currentDate = date('Y-m-d');
-$stmt = $db->prepare("SELECT * FROM transactions WHERE user_id = ?");
-$stmt->execute([$userId]);
-$allTransactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$total_recettes = 0;
-$total_depenses = 0;
-
-foreach ($allTransactions as $t) {
-    // Transaction future = ignorée
-    if ($t['transaction_date'] > $currentDate) {
-        continue;
-    }
-
-    $amount = (float) $t['amount'];
-    $count = 1; // Par défaut : 1 occurrence
-
-    // Calculer le nombre d'occurrences
-    if ($t['recurring_months'] > 1) {
-        // Récurrence limitée
-        if ($t['periodicity'] === 'mensuel') {
-            $elapsed = floor((strtotime($currentDate) - strtotime($t['transaction_date'])) / (30.44 * 86400)) + 1;
-            $count = min($t['recurring_months'], $elapsed);
-        } elseif ($t['periodicity'] === 'hebdo') {
-            $elapsed = floor((strtotime($currentDate) - strtotime($t['transaction_date'])) / (7 * 86400)) + 1;
-            $count = min($t['recurring_months'], $elapsed);
-        } elseif ($t['periodicity'] === 'annuel') {
-            $elapsed = floor((strtotime($currentDate) - strtotime($t['transaction_date'])) / (365.25 * 86400)) + 1;
-            $count = min($t['recurring_months'], $elapsed);
-        }
-    } elseif ($t['recurring_months'] === 0 && ($t['periodicity'] === 'mensuel' || $t['periodicity'] === 'hebdo' || $t['periodicity'] === 'annuel')) {
-        // Récurrence infinie
-        $endDate = $t['end_date'] ? min($t['end_date'], $currentDate) : $currentDate;
-
-        if ($t['periodicity'] === 'mensuel') {
-            $count = floor((strtotime($endDate) - strtotime($t['transaction_date'])) / (30.44 * 86400)) + 1;
-        } elseif ($t['periodicity'] === 'hebdo') {
-            $count = floor((strtotime($endDate) - strtotime($t['transaction_date'])) / (7 * 86400)) + 1;
-        } elseif ($t['periodicity'] === 'annuel') {
-            $count = floor((strtotime($endDate) - strtotime($t['transaction_date'])) / (365.25 * 86400)) + 1;
-        }
-    }
-
-    $total = $amount * $count;
-
-    if ($t['type'] === 'recette') {
-        $total_recettes += $total;
-    } else {
-        $total_depenses += $total;
-    }
-}
-
-$balance = $total_recettes - $total_depenses;
 
 // Gérer le mois sélectionné
 $selectedMonth = $_GET['month'] ?? date('Y-m');
@@ -363,7 +321,11 @@ $selectedType = $_GET['type'] ?? 'depense';
                         <label>Type de récurrence</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="edit_recurrence_type" value="count" checked>
+                                <input type="radio" name="edit_recurrence_type" value="no_limit" checked>
+                                <span>Pas de limite</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="edit_recurrence_type" value="count">
                                 <span>Nombre d'occurrences</span>
                             </label>
                             <label class="radio-label">
@@ -375,12 +337,12 @@ $selectedType = $_GET['type'] ?? 'depense';
                 </div>
 
                 <div class="modal-form-row">
-                    <div class="form-group" id="edit_recurring_months_group">
+                    <div class="form-group" id="edit_recurring_months_group" style="display: none;">
                         <label for="edit_recurring_months">
-                            Nombre de mois
-                            <span class="tooltip-icon" data-tooltip="0 = infini, 1 = ponctuel">?</span>
+                            Nombre d'occurrences
+                            <span class="tooltip-icon" data-tooltip="Nombre de fois que la transaction se répète">?</span>
                         </label>
-                        <input type="number" id="edit_recurring_months" name="recurring_months" min="0" value="0">
+                        <input type="number" id="edit_recurring_months" name="recurring_months" min="1" value="1">
                     </div>
                     <div class="form-group" id="edit_end_date_group" style="display: none;">
                         <label for="edit_end_date">
@@ -421,6 +383,7 @@ $selectedType = $_GET['type'] ?? 'depense';
     </div>
     <div class="container">
         <?php include 'includes/migrations_alert.php'; ?>
+        <?php include 'includes/flash_messages.php'; ?>
 
         <header>
             <div class="month-navigation">
@@ -442,9 +405,10 @@ $selectedType = $_GET['type'] ?? 'depense';
                     <span class="stat-value negative">-<?= number_format($monthTotals['month_depenses'], 2, ',', ' ') ?> €</span>
                 </div>
                 <div class="header-stat balance">
-                    <span class="stat-label">Solde actuel</span>
-                    <span class="stat-value <?= $balance >= 0 ? 'positive' : 'negative' ?>">
-                        <?= number_format($balance, 2, ',', ' ') ?> €
+                    <span class="stat-label">Solde du mois</span>
+                    <?php $monthBalance = $monthTotals['month_recettes'] - $monthTotals['month_depenses']; ?>
+                    <span class="stat-value <?= $monthBalance >= 0 ? 'positive' : 'negative' ?>">
+                        <?= number_format($monthBalance, 2, ',', ' ') ?> €
                     </span>
                 </div>
             </div>
@@ -505,7 +469,11 @@ $selectedType = $_GET['type'] ?? 'depense';
                         <label>Type de récurrence</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="recurrence_type" value="count" checked>
+                                <input type="radio" name="recurrence_type" value="no_limit" checked>
+                                <span>Pas de limite</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="recurrence_type" value="count">
                                 <span>Nombre d'occurrences</span>
                             </label>
                             <label class="radio-label">
@@ -515,12 +483,12 @@ $selectedType = $_GET['type'] ?? 'depense';
                         </div>
                     </div>
 
-                    <div class="form-group" id="recurring_months_group">
+                    <div class="form-group" id="recurring_months_group" style="display: none;">
                         <label for="recurring_months">
-                            Nombre de mois
-                            <span class="tooltip-icon" data-tooltip="0 = infini, 1 = ponctuel">?</span>
+                            Nombre d'occurrences
+                            <span class="tooltip-icon" data-tooltip="Nombre de fois que la transaction se répète">?</span>
                         </label>
-                        <input type="number" id="recurring_months" name="recurring_months" min="0" value="0">
+                        <input type="number" id="recurring_months" name="recurring_months" min="1" value="1">
                     </div>
 
                     <div class="form-group" id="end_date_group" style="display: none;">
