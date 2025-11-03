@@ -38,8 +38,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     // Gérer la récurrence : nombre de mois OU date de fin
+    $recurrenceType = $_POST['recurrence_type'] ?? 'no_limit';
     $recurringMonths = (int) ($_POST['recurring_months'] ?? 0);
     $endDate = !empty($_POST['end_date']) ? $_POST['end_date'] : null;
+
+    // Validation : si type "date" est sélectionné, end_date doit être rempli
+    if ($recurrenceType === 'date' && empty($endDate)) {
+        setFlash('error', 'Veuillez spécifier une date de fin pour la récurrence.');
+        header('Location: index.php');
+        exit;
+    }
 
     // Validation : recurring_months doit être 0 (infini) ou >= 1, jamais négatif
     if ($recurringMonths < 0) {
@@ -91,8 +99,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     // Gérer la récurrence : nombre de mois OU date de fin
+    $recurrenceType = $_POST['edit_recurrence_type'] ?? 'no_limit';
     $recurringMonths = (int) ($_POST['recurring_months'] ?? 0);
     $endDate = !empty($_POST['end_date']) ? $_POST['end_date'] : null;
+
+    // Validation : si type "date" est sélectionné, end_date doit être rempli
+    if ($recurrenceType === 'date' && empty($endDate)) {
+        setFlash('error', 'Veuillez spécifier une date de fin pour la récurrence.');
+        header('Location: index.php#transaction-' . $id);
+        exit;
+    }
 
     // Validation : recurring_months doit être 0 (infini) ou >= 1, jamais négatif
     if ($recurringMonths < 0) {

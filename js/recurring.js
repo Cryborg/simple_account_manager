@@ -34,21 +34,27 @@ document.addEventListener('DOMContentLoaded', function() {
             endDateGroup.style.display = 'none';
             recurringMonthsInput.value = '0';
             endDateInput.value = '';
+            endDateInput.removeAttribute('required');
+            recurringMonthsInput.removeAttribute('required');
             if (endDateCount) endDateCount.textContent = '';
         } else if (value === 'count') {
             // Nombre d'occurrences : afficher le champ nombre, cacher la date
             recurringMonthsGroup.style.display = 'flex';
             endDateGroup.style.display = 'none';
             endDateInput.value = '';
+            endDateInput.removeAttribute('required');
             recurringMonthsInput.value = '1'; // Valeur par défaut : 1 occurrence minimum
             recurringMonthsInput.disabled = false;
+            recurringMonthsInput.setAttribute('required', 'required');
             if (endDateCount) endDateCount.textContent = '';
         } else {
             // Jusqu'à une date : afficher la date, cacher le nombre
             recurringMonthsGroup.style.display = 'none';
             endDateGroup.style.display = 'flex';
             recurringMonthsInput.value = '0';
+            recurringMonthsInput.removeAttribute('required');
             endDateInput.disabled = false;
+            endDateInput.setAttribute('required', 'required');
         }
     }
 
