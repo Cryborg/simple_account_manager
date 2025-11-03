@@ -1974,7 +1974,7 @@ tbody tr:target {
 /* Card View (both mobile and desktop) */
 .transactions-cards {
     display: none;
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 1rem;
 }
 
@@ -1983,7 +1983,20 @@ tbody tr:target {
 }
 
 .transactions[data-view="cards"] .transactions-cards {
-    display: flex;
+    display: grid;
+}
+
+/* Responsive grid: adapt columns based on screen size */
+@media (min-width: 769px) {
+    .transactions-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .transactions-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* Transaction Cards (works on both mobile and desktop) */
@@ -2077,7 +2090,7 @@ tbody tr:target {
     }
 
     .transactions-cards {
-        display: flex !important;
+        display: grid !important;
     }
 }
 
