@@ -2005,6 +2005,7 @@ tbody tr:target {
     border-radius: 0.5rem;
     padding: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.2s ease;
     position: relative;
 }
@@ -2012,6 +2013,7 @@ tbody tr:target {
 .transaction-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 
 .transaction-card-header {
